@@ -1,16 +1,114 @@
-E-Commerce-Data-Engineering-LakehouseEnd-to-end e-commerce data engineering pipeline using PySpark, Delta Lake, data quality validation, Quality Gate, Quarantine, and business analytics.Modern Data Engineering for AI Systems — SDAIA Academy Final ProjectAn end-to-end Data Engineering Lakehouse pipeline for processing e-commerce transaction data using PySpark and Delta Lake.The project demonstrates how raw transaction data can be ingested, validated, cleaned, separated into trusted and invalid records, stored using Delta Lake, and transformed into business analytics.⸻Project OverviewE-commerce transaction data can contain data-quality issues such as:Missing valuesInvalid pricesZero quantitiesDuplicate transactionsInvalid transaction typesCancellation transactionsThis project implements a controlled data engineering pipeline that identifies these issues, separates invalid records into a Quarantine layer, and stores trusted data in a Silver Delta Lake layer for downstream analytics.⸻Project ObjectivesThe main objectives are to:Build an end-to-end data engineering pipeline.Ingest structured e-commerce transaction data.Store raw data in a Bronze Delta Lake layer.Apply automated data-quality validation.Separate failed records into a Quarantine layer.Transform trusted records into a Silver Delta Lake layer.Generate business analytics from trusted data.Demonstrate Delta Lake capabilities and transaction history.Build a reliable data foundation for future AI/ML applications.⸻Architecture   ⸻Data Engineering Pipeline1. Data IngestionThe pipeline uses PySpark to create and process the input DataFrame.The sample contains transaction fields such as:InvoiceNoStockCodeDescriptionQuantityInvoiceDateUnitPriceCustomerIDCountry⸻2. Bronze LayerThe raw input data is stored as a Delta Lake Bronze table.The Bronze layer preserves the ingested data before trusted transformations.Raw Data↓Bronze Delta Lake⸻3. Data Quality ValidationThe project applies multiple data-quality checks.CompletenessChecks critical fields for missing values:InvoiceNoStockCodeQuantityUnitPriceInvoiceDateCountryCustomerID is not treated as a mandatory field in the main quality report because the source data can contain missing customer identifiers.ValidityThe pipeline checks for:Null UnitPriceNegative UnitPriceNull QuantityZero QuantityUniquenessDuplicate transaction records are identified using the transaction columns.Business RulesThe pipeline validates transaction behavior:Standard invoices should have positive quantities.Cancellation invoices beginning with C should have negative quantities.⸻Quality GateAfter the quality checks, the pipeline creates a Quality Gate.Data Quality Report│▼Quality Gate/PASS      FAIL│          │▼          ▼Silver    QuarantineRecords that fail the validation rules are routed to the Quarantine layer instead of being included in trusted analytics.This approach prevents invalid records from directly affecting downstream business analysis.⸻Delta Lake LayersBronzeContains the ingested raw transaction data./tmp/delta/bronzeSilverContains validated and transformed trusted transaction data./tmp/delta/silverQuarantineContains records that fail data-quality validation./tmp/delta/quarantine⸻Trusted Data TransformationThe trusted dataset is created after applying the required validation rules. The pipeline also derives additional fields.RevenueRevenue = Quantity × UnitPriceTransactionTypeTransactions are classified as:SaleCancellationbased on the InvoiceNo.OrderDateThe transaction timestamp is converted into a date field for analytics.⸻AnalyticsBusiness analytics are generated from trusted Silver data.The current implementation includes:Sales KPIsTotal OrdersUnique CustomersTotal Sales RevenueAverage Line RevenueRevenue by CountryProvides:Revenue by countryNumber of distinct invoicesRevenue by ProductProvides:Revenue by productQuantity sold by productMonthly RevenueAggregates sales revenue by month to identify monthly trends.The current implementation calculates Sales Revenue from transactions classified as Sale. It does not implement a separate net-revenue calculation.⸻Data Quality Test CasesThe notebook includes both passing and failing examples.PASS ExamplesValid sales transactions and valid cancellation transactions.FAIL ExamplesThe pipeline tests scenarios such as:Duplicate recordsNegative quantity on a standard invoiceNegative UnitPriceThese cases demonstrate how the Quality Gate identifies invalid records and routes them to Quarantine.⸻TechnologiesTechnologyPurposePythonProgramming languagePySparkDistributed data processingApache SparkData processing engineDelta LakeReliable data storage and table managementPandasExcel data ingestionGoogle ColabDevelopment environmentGitHubVersion control and project sharing⸻Project StructurePlaintextecommerce-data-engineering-lakehouse/
-│
-├── notebooks/
-│   └── e-ecommerce_data_engineering.ipynb
-│
-├── architecture/
-│   └── workflow.png
-│
-└── README.md
-⸻InstallationInstall the required Python packages:Bashpip install pyspark delta-spark openpyxl
-Or install them using:Bashpip install -r requirements.txt
-⸻How to RunOption 1 — Google ColabOpen the notebook directly in Google Colab:Open the E-Commerce Data Engineering Notebook in Google ColabOption 2 — Local EnvironmentClone the repository:Bashgit clone https://github.com/YOUR-USERNAME/ecommerce-data-engineering-lakehouse.git
-Navigate to the project:Bashcd ecommerce-data-engineering-lakehouse
-Install dependencies:Bashpip install -r requirements.txt
-Then open the notebook and run the cells sequentially.⸻Delta Lake HistoryThe project demonstrates Delta Lake table history using:SQLDESCRIBE HISTORY delta.`{SILVER_PATH}`
-This allows the pipeline to inspect the history of changes to the Silver Delta table.⸻Project DeliverablesThe project includes:PySpark data ingestion pipelineBronze Delta Lake layerAutomated data-quality checksQuality GateQuarantine layerSilver Delta Lake layerData transformationsBusiness analyticsDelta Lake historyProject architectureGitHub documentation⸻Future ImprovementsPotential extensions for the project include:Implementing a dedicated Gold analytics layer.Adding incremental data processing.Adding automated data-quality monitoring.Adding orchestration using Apache Airflow or a cloud orchestration service.Connecting the pipeline to a cloud data platform.Adding machine-learning features based on trusted transaction data.Building an AI/RAG application on top of the trusted data.These are future extensions and are not part of the current implementation.⸻ReferencesDelta Lake DocumentationApache Spark / PySpark DocumentationGoogle Colab⸻E-Commerce Data Engineering LakehouseModern Data Engineering for AI Systems — SDAIA Academy Final ProjectBuilt with Python, PySpark, Apache Spark, and Delta Lake.SDAIA Academy Link: https://github.com/SDAIAAcademy
+# E-Commerce Data Engineering Lakehouse
+
+Modern Data Engineering for AI Systems — SDAIA Academy Final Project
+
+An end-to-end Data Engineering Lakehouse pipeline for processing e-commerce transaction data using PySpark and Delta Lake. 
+
+The project demonstrates how raw transaction data can be ingested, validated, cleaned, separated into trusted and invalid records, stored using Delta Lake, and transformed into business analytics.
+
+---
+
+## Project Overview
+
+E-commerce transaction data can contain data-quality issues such as:
+* Missing values
+* Invalid prices
+* Zero quantities
+* Duplicate transactions
+* Invalid transaction types
+* Cancellation transactions
+
+This project implements a controlled data engineering pipeline that identifies these issues, separates invalid records into a Quarantine layer, and stores trusted data in a Silver Delta Lake layer for downstream analytics.
+
+---
+
+## Project Objectives
+
+The main objectives are to:
+* Build an end-to-end data engineering pipeline.
+* Ingest structured e-commerce transaction data.
+* Store raw data in a Bronze Delta Lake layer.
+* Apply automated data-quality validation.
+* Separate failed records into a Quarantine layer.
+* Transform trusted records into a Silver Delta Lake layer.
+* Generate business analytics from trusted data.
+* Demonstrate Delta Lake capabilities and transaction history.
+* Build a reliable data foundation for future AI/ML applications.
+
+---
+
+## Architecture
+
+![Architecture](workflow.png)
+
+---
+
+## Data Engineering Pipeline
+
+### 1. Data Ingestion
+The pipeline uses PySpark to create and process the input DataFrame. 
+The sample contains transaction fields such as:
+* InvoiceNo
+* StockCode
+* Description
+* Quantity
+* InvoiceDate
+* UnitPrice
+* CustomerID
+* Country
+
+### 2. Bronze Layer
+The raw input data is stored as a Delta Lake Bronze table.
+The Bronze layer preserves the ingested data before trusted transformations.
+
+`Raw Data` ➔ `Bronze Delta Lake`
+
+### 3. Data Quality Validation
+The project applies multiple data-quality checks.
+
+**Completeness**
+Checks critical fields for missing values:
+* InvoiceNo
+* StockCode
+* Quantity
+* UnitPrice
+* InvoiceDate
+* Country
+
+*Note: CustomerID is not treated as a mandatory field in the main quality report because the source data can contain missing customer identifiers.*
+
+**Validity**
+The pipeline checks for:
+* Null UnitPrice
+* Negative UnitPrice
+* Null Quantity
+* Zero Quantity
+
+**Uniqueness**
+Duplicate transaction records are identified using the transaction columns.
+
+**Business Rules**
+The pipeline validates transaction behavior:
+* Standard invoices should have positive quantities.
+* Cancellation invoices beginning with C should have negative quantities.
+
+---
+
+## Quality Gate
+
+After the quality checks, the pipeline creates a Quality Gate.
+
+```text
+       Data Quality Report
+               │
+               ▼
+          Quality Gate
+            /        \
+         PASS        FAIL
+          │            │
+          ▼            ▼
+        Silver     Quarantine
+
+
+
+SDAIA Academy link: https://github.com/SDAIAAcademy
