@@ -22,8 +22,7 @@ E-commerce transaction data can contain data-quality issues such as:
 This project implements a controlled data engineering pipeline that identifies these issues, separates invalid records into a Quarantine layer, and stores trusted data in a Silver Delta Lake layer for downstream analytics.
 
 ⸻
-
-🎯 Project Objectives
+ Project Objectives
 
 The main objectives are to:
 
@@ -40,38 +39,7 @@ The main objectives are to:
 
 
  Architecture
-
-                 E-Commerce Transaction Data
-                           │
-                           ▼
-                    PySpark Ingestion
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │    Bronze   │
-                    │  Delta Lake │
-                    └─────────────┘
-                           │
-                           ▼
-                 Data Quality Checks
-                           │
-                           ▼
-                     Quality Gate
-                      /         \
-                   PASS           FAIL
-                    │              │
-                    ▼              ▼
-             ┌───────────┐   ┌─────────────┐
-             │   Silver  │   │ Quarantine  │
-             │ Delta Lake│   │ Delta Lake  │
-             └───────────┘   └─────────────┘
-                    │
-                    ▼
-                Transformations
-                    │
-                    ▼
-                 Analytics
-
+<img src="view-source:https://github.com/lameesalghamlas/E-Commerce-Data-Engineering-Lakehouse/blob/main/workflow.png" width="300">   
 
 
  Data Source
