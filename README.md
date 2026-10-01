@@ -42,7 +42,7 @@ The main objectives are to:
 
  Architecture
           
-
+<img src="" width="300">   
 ⸻
 
  Data Engineering Pipeline
@@ -182,7 +182,7 @@ The transaction timestamp is converted into a date field for analytics.
 
 ⸻
 
-📈 Analytics
+ Analytics
 
 Business analytics are generated from trusted Silver data.
 
@@ -255,14 +255,12 @@ Project Structure
 ecommerce-data-engineering-lakehouse/
 │
 ├── notebooks/
-│   └── ecommerce_data_engineering.ipynb
+│   └── e-ecommerce_data_engineering.ipynb
 │
 ├── architecture/
 │   └── architecture.png
 │
-├── README.md
-│
-└── requirements.txt
+└── README.md
 
 ⸻
  Installation
@@ -361,3 +359,6 @@ E-Commerce Data Engineering Lakehouse
 Modern Data Engineering for AI Systems — SDAIA Academy Final Project
 
 Built with Python, PySpark, Apache Spark, and Delta Lake.
+
+
+SDAIA Academy Link: "https://github.com/SDAIAAcademy"
